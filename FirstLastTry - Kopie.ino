@@ -48,7 +48,7 @@ void handleRoot() {
   server.send(200, "text/html", "<!DOCTYPE html>  \
 <head>  \
     <title>LED Controller</title>  \
-    <link rel='stylesheet' type='text/css' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css'>  \
+    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' media='screen'>  \
     <script>  \
         window.onload = function() { \
             var buttnext = document.getElementById('buttnext'); \
@@ -100,16 +100,93 @@ void handleRoot() {
                 xhr.setRequestHeader('Content-Type', 'application/json'); \
                 xhr.send(JSON.stringify({ \
                     action: 'sinelon'}));}, false); \
+      var buttjuggle = document.getElementById('buttjuggle'); \
+      buttjuggle.addEventListener('click', function(e){  \
+                var xhr = new XMLHttpRequest(); \
+                xhr.open('POST', '/juggle', true);  \
+                xhr.setRequestHeader('Content-Type', 'application/json'); \
+                xhr.send(JSON.stringify({ \
+                    action: 'juggle'}));}, false); \
+      var buttrainbowRT = document.getElementById('buttrainbowRT'); \
+      buttrainbowRT.addEventListener('click', function(e){  \
+                var xhr = new XMLHttpRequest(); \
+                xhr.open('POST', '/rainbowRT', true);  \
+                xhr.setRequestHeader('Content-Type', 'application/json'); \
+                xhr.send(JSON.stringify({ \
+                    action: 'rainbowRT'}));}, false); \
+      var buttbpm = document.getElementById('buttbpm'); \
+      buttbpm.addEventListener('click', function(e){  \
+                var xhr = new XMLHttpRequest(); \
+                xhr.open('POST', '/bpm', true);  \
+                xhr.setRequestHeader('Content-Type', 'application/json'); \
+                xhr.send(JSON.stringify({ \
+                    action: 'bpm'}));}, false); \
         } \
     </script> \
 </head> \
   \
 <body>  \
-    <h1>LED Controller</h1> \
-    <table><tr> \
-    <td><button class='btn btn-primary' id='buttnext'>next</button></td><td><button class='btn btn-primary' id='buttlast'>last</button></td><td><button class='btn btn-primary' id='buttsinelon'>sinelon</button></td>  \
-    </tr><tr><td><button class='btn btn-primary' id='buttconfetti'>confetti</button></td><td><button class='btn btn-primary' id='buttrainbow'>rainbow</button></td><td><button class='btn btn-primary' id='buttcloudSlowBeatWave'>cloudSlowBeatWave</button></td><td><button class='btn btn-primary' id='buttrainbowBT'>rainbowBlueTone</button>  \
-    </tr></table> \
+    <h1>LED Controller</h1>\
+<div class='panel panel-default'>\
+    <div class='panel-heading'>Animation</div>\
+    <div class='panel-body'>\
+            <div class='row'>\
+                <div class='col-sm-4 btn-group-vertical' role='group'>\
+                    <button class='btn btn-primary' id='buttnext'>Next</button>\
+                    <button class='btn btn-primary' id='buttlast'>Last</button>\
+                    <button class='btn btn-primary' id='buttconfetti'>Confetti</button>\
+                    <button class='btn btn-primary' id='buttrainbow'>Rainbow</button>\
+                    <button class='btn btn-primary' id='buttcloudSlowBeatWave'>CloudSlowBeatWave</button>\
+                    <button class='btn btn-primary' id='buttrainbowBT'>RainbowBlueTone</button>\
+                    <button class='btn btn-primary' id='buttsinelon'>Sinelon</button>\
+                    <button class='btn btn-primary' id='buttjuggle'>Juggle</button>\
+                    <button class='btn btn-primary' id='buttrainbowRT'>RainbowRedTone</button>\
+                    <button class='btn btn-primary' id='buttbpm'>BPM</button>\
+                </div>\
+                <div class='col-sm-4 btn-group-vertical'>\
+                    <button class='btn btn-primary' name='203' type='submit'>Pixel Bounce</button>\
+                    <button class='btn btn-primary' name='211' type='submit'>Pixel Smooth Shift Right</button>\
+                    <button class='btn btn-primary' name='212' type='submit'>Pixel Smooth Shift Left</button>\
+                    <button class='btn btn-primary' name='213' type='submit'>Pixel Smooth Bounce</button>\
+                    <button class='btn btn-primary' name='221' type='submit'>Comet</button>\
+                    <button class='btn btn-primary' name='222' type='submit'>Comet (colored)</button>\
+                    <button class='btn btn-primary' name='241' type='submit'>Moving Bars</button>\
+                    <button class='btn btn-primary' name='242' type='submit'>Moving Gradient</button>\
+                    <button class='btn btn-primary' name='251' type='submit'>Larson Scanner</button>\
+                    <button class='btn btn-primary' name='252' type='submit'>Larson Scanner 2</button>\
+                </div>\
+                <div class='col-sm-4 btn-group-vertical'>\
+                    <button class='btn btn-primary' name='301' type='submit'>FadeIn</button>\
+                    <button class='btn btn-primary' name='302' type='submit'>FadeOut</button>\
+                    <button class='btn btn-primary' name='303' type='submit'>FadeInOut</button>\
+                    <button class='btn btn-primary' name='304' type='submit'>Glow</button>\
+                    <button class='btn btn-primary' name='351' type='submit'>Fade Colors</button>\
+                    <button class='btn btn-primary' name='352' type='submit'>Fade Colors (loop)</button>\
+                    <button class='btn btn-primary' name='353' type='submit'>Pixels Fade</button>\
+                    <button class='btn btn-primary' name='501' type='submit'>Fire</button>\
+                    <button class='btn btn-primary' name='502' type='submit'>Bouncing Balls</button>\
+                    <button class='btn btn-primary' name='503' type='submit'>Larson Scanner 2</button>\
+                </div>\
+            </div>\
+    </div>\
+</div>\
+\
+\
+<div class='row'>\
+<div class='col-sm-4'>\
+    <div class='panel panel-default'>\
+        <div class='panel-heading'>Brightness</div>\
+        <div class='panel-body' class='btn-group' role='group'>\
+            <form action='/brightness/' method='post'>\
+                <button class='btn btn-primary' name='8' type='submit'>20%</button>\
+                <button class='btn btn-primary' name='16' type='submit'>40%</button>\
+                <button class='btn btn-primary' name='32' type='submit'>60%</button>\
+                <button class='btn btn-primary' name='64' type='submit'>80%</button>\
+                <button class='btn btn-primary' name='100' type='submit'>100%</button>\
+            </form>\
+        </div>\
+    </div>\
+</div>\
 </body>");
 }
 
@@ -147,6 +224,18 @@ void startWifi() {
   });
   server.on("/sinelon", HTTP_POST, [](){
     switchPattern(4);
+    server.send(200, "text/plain", "OK");
+  });
+  server.on("/juggle", HTTP_POST, [](){
+    switchPattern(5);
+    server.send(200, "text/plain", "OK");
+  });
+  server.on("/rainbowRT", HTTP_POST, [](){
+    switchPattern(6);
+    server.send(200, "text/plain", "OK");
+  });
+  server.on("/bpm", HTTP_POST, [](){
+    switchPattern(7);
     server.send(200, "text/plain", "OK");
   });
   server.on("/next", HTTP_POST, [](){
@@ -193,44 +282,34 @@ void loop(void) {
 
 void switchPattern(int criteria){
   switch (criteria) {
-    case 0:
-    //confetti
-      currentAnimation = (currentAnimation - currentAnimation) % ARRAY_SIZE(animations);
+    case 0:    //confetti
+      currentAnimation = criteria;
       break;
-    case 1:
-    //rainbow
-      currentAnimation = (currentAnimation - currentAnimation + 1) % ARRAY_SIZE(animations);
+    case 1:    //rainbow
+      currentAnimation = criteria;
       break;
-    case 2:
-    //cloudSlowBeatWave
-      currentAnimation = (currentAnimation - currentAnimation + 2) % ARRAY_SIZE(animations);
+    case 2:    //cloudSlowBeatWave
+      currentAnimation = criteria;
       break;
-    case 3:
-    //rainbowBT
-      currentAnimation = (currentAnimation - currentAnimation + 3) % ARRAY_SIZE(animations);
+    case 3:    //rainbowBT
+      currentAnimation = criteria;
       break;
-    case 4:
-    //sinelon
-      currentAnimation = (currentAnimation - currentAnimation + 4) % ARRAY_SIZE(animations);
+    case 4:    //sinelon
+      currentAnimation = criteria;
       break;
-    case 5:
-    //juggle
-      currentAnimation = (currentAnimation - currentAnimation + 5) % ARRAY_SIZE(animations);
+    case 5:    //juggle
+      currentAnimation = criteria;
       break;
-    case 6:
-    //rainbowRT
-      currentAnimation = (currentAnimation - currentAnimation + 6) % ARRAY_SIZE(animations);
+    case 6:    //rainbowRT
+      currentAnimation = criteria;
       break;
-    case 7:
-    //bpm
-      currentAnimation = (currentAnimation - currentAnimation + 7) % ARRAY_SIZE(animations);
+    case 7:    //bpm
+      currentAnimation = criteria;
       break;
-    case 100:
-    //next
+    case 100:    //next
       currentAnimation = (currentAnimation + 1) % ARRAY_SIZE(animations);
       break;
-   case 101:
-    //last
+   case 101:    //last
       currentAnimation = (currentAnimation - 1) % ARRAY_SIZE(animations);
       break;
   }
