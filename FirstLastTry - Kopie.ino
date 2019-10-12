@@ -30,7 +30,7 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS    36
 CRGB leds[NUM_LEDS];
 
-#define BRIGHTNESS         100
+#define BRIGHTNESS         30
 #define FRAMES_PER_SECOND  120
 
 // inspired by the Fast LED examples!
@@ -121,6 +121,27 @@ void handleRoot() {
                 xhr.setRequestHeader('Content-Type', 'application/json'); \
                 xhr.send(JSON.stringify({ \
                     action: 'bpm'}));}, false); \
+      var buttstrobe = document.getElementById('buttstrobe'); \
+      buttstrobe.addEventListener('click', function(e){  \
+                var xhr = new XMLHttpRequest(); \
+                xhr.open('POST', '/strobe', true);  \
+                xhr.setRequestHeader('Content-Type', 'application/json'); \
+                xhr.send(JSON.stringify({ \
+                    action: 'strobe'}));}, false); \
+      var buttmeteorRain = document.getElementById('buttmeteorRain'); \
+      buttmeteorRain.addEventListener('click', function(e){  \
+                var xhr = new XMLHttpRequest(); \
+                xhr.open('POST', '/meteorRain', true);  \
+                xhr.setRequestHeader('Content-Type', 'application/json'); \
+                xhr.send(JSON.stringify({ \
+                    action: 'meteorRain'}));}, false); \
+      var buttbright8 = document.getElementById('buttbright8'); \
+      buttbright8.addEventListener('click', function(e){  \
+                var xhr = new XMLHttpRequest(); \
+                xhr.open('POST', '/buttbright8', true);  \
+                xhr.setRequestHeader('Content-Type', 'application/json'); \
+                xhr.send(JSON.stringify({ \
+                    action: 'buttbright8'}));}, false); \
         } \
     </script> \
 </head> \
@@ -144,8 +165,8 @@ void handleRoot() {
                     <button class='btn btn-primary' id='buttbpm'>BPM</button>\
                 </div>\
                 <div class='col-sm-4 btn-group-vertical'>\
-                    <button class='btn btn-primary' name='203' type='submit'>Pixel Bounce</button>\
-                    <button class='btn btn-primary' name='211' type='submit'>Pixel Smooth Shift Right</button>\
+                    <button class='btn btn-primary' id='buttstrobe'>Strobe</button>\
+                    <button class='btn btn-primary' id='buttmeteorRain'>meteorRain</button>\
                     <button class='btn btn-primary' name='212' type='submit'>Pixel Smooth Shift Left</button>\
                     <button class='btn btn-primary' name='213' type='submit'>Pixel Smooth Bounce</button>\
                     <button class='btn btn-primary' name='221' type='submit'>Comet</button>\
@@ -177,13 +198,11 @@ void handleRoot() {
     <div class='panel panel-default'>\
         <div class='panel-heading'>Brightness</div>\
         <div class='panel-body' class='btn-group' role='group'>\
-            <form action='/brightness/' method='post'>\
-                <button class='btn btn-primary' name='8' type='submit'>20%</button>\
-                <button class='btn btn-primary' name='16' type='submit'>40%</button>\
-                <button class='btn btn-primary' name='32' type='submit'>60%</button>\
-                <button class='btn btn-primary' name='64' type='submit'>80%</button>\
-                <button class='btn btn-primary' name='100' type='submit'>100%</button>\
-            </form>\
+                <button class='btn btn-primary' id='buttbright8'>20%</button>\
+                <button class='btn btn-primary' id='buttbright16'>40%</button>\
+                <button class='btn btn-primary' id='buttbright32'>60%</button>\
+                <button class='btn btn-primary' id='buttbright64'>80%</button>\
+                <button class='btn btn-primary' id='buttbright100'>100%</button>\
         </div>\
     </div>\
 </div>\
@@ -238,12 +257,24 @@ void startWifi() {
     switchPattern(7);
     server.send(200, "text/plain", "OK");
   });
+  server.on("/strobe", HTTP_POST, [](){
+    switchPattern(8);
+    server.send(200, "text/plain", "OK");
+  });
+  server.on("/meteorRain", HTTP_POST, [](){
+    switchPattern(9);
+    server.send(200, "text/plain", "OK");
+  });
   server.on("/next", HTTP_POST, [](){
     switchPattern(100);
     server.send(200, "text/plain", "OK");
   });
   server.on("/last", HTTP_POST, [](){
     switchPattern(101);
+    server.send(200, "text/plain", "OK");
+  });
+  server.on("/buttbright8", HTTP_POST, [](){
+    switchPattern(201);
     server.send(200, "text/plain", "OK");
   });
   server.onNotFound([]() {
@@ -268,7 +299,7 @@ void setup(void) {
 }
 
 typedef void (*Animations[])();
-Animations animations = { confetti, rainbow, cloudSlowBeatWave, rainbowBlueTone, sinelon, juggle, rainbowRedTone, bpm };
+Animations animations = { confetti, rainbow, cloudSlowBeatWave, rainbowBlueTone, sinelon, juggle, rainbowRedTone, bpm, Strobe, meteorRain };
 
 void loop(void) {
   server.handleClient();
@@ -306,11 +337,20 @@ void switchPattern(int criteria){
     case 7:    //bpm
       currentAnimation = criteria;
       break;
+    case 8:    //Strobe
+      currentAnimation = criteria;
+      break;
+    case 9:    //meteorRain
+      currentAnimation = criteria;
+      break;
     case 100:    //next
       currentAnimation = (currentAnimation + 1) % ARRAY_SIZE(animations);
       break;
-   case 101:    //last
+    case 101:    //last
       currentAnimation = (currentAnimation - 1) % ARRAY_SIZE(animations);
+      break;
+    case 201:    //Brightness 8
+      #define BRIGHTNESS         8
       break;
   }
 }
@@ -386,4 +426,108 @@ void cloudSlowBeatWave() {
     leds[i] = ColorFromPalette(CloudColors_p, colorIndex, NUM_LEDS, LINEARBLEND);
   }
   FastLED.setTemperature(UncorrectedTemperature);
+}
+
+void Strobe(){
+  byte red = 0xff; byte green = 0xff; byte blue = 0xff; int StrobeCount = 10; int FlashDelay = 50; int EndPause = 1000;
+  for(int j = 0; j < StrobeCount; j++) {
+    setAll(red,green,blue);
+    showStrip();
+    delay(FlashDelay);
+    setAll(0,0,0);
+    showStrip();
+    delay(FlashDelay);
+  }
+ 
+ delay(EndPause);
+}
+
+
+void meteorRain() {
+  byte red = 0xff; byte green = 0x00; byte blue = 0x12; byte meteorSize = 10; byte meteorTrailDecay = 64; boolean meteorRandomDecay = true; int SpeedDelay = 30;
+  setAll(0,0,0);
+  
+  for(int i = 0; i < NUM_LEDS+NUM_LEDS; i++) {
+    
+    
+    // fade brightness all LEDs one step
+    for(int j=0; j<NUM_LEDS; j++) {
+      if( (!meteorRandomDecay) || (random(10)>5) ) {
+        fadeToBlack(j, meteorTrailDecay );        
+      }
+    }
+    
+    // draw meteor
+    for(int j = 0; j < meteorSize; j++) {
+      if( ( i-j <NUM_LEDS) && (i-j>=0) ) {
+        setPixel(i-j, red, green, blue);
+      } 
+    }
+   
+    showStrip();
+    delay(SpeedDelay);
+  }
+}
+
+// used by meteorrain
+void fadeToBlack(int ledNo, byte fadeValue) {
+ #ifdef ADAFRUIT_NEOPIXEL_H 
+    // NeoPixel
+    uint32_t oldColor;
+    uint8_t r, g, b;
+    int value;
+    
+    oldColor = strip.getPixelColor(ledNo);
+    r = (oldColor & 0x00ff0000UL) >> 16;
+    g = (oldColor & 0x0000ff00UL) >> 8;
+    b = (oldColor & 0x000000ffUL);
+
+    r=(r<=10)? 0 : (int) r-(r*fadeValue/256);
+    g=(g<=10)? 0 : (int) g-(g*fadeValue/256);
+    b=(b<=10)? 0 : (int) b-(b*fadeValue/256);
+    
+    strip.setPixelColor(ledNo, r,g,b);
+ #endif
+ #ifndef ADAFRUIT_NEOPIXEL_H
+   // FastLED
+   leds[ledNo].fadeToBlackBy( fadeValue );
+ #endif  
+}
+
+// ***************************************
+// ** FastLed/NeoPixel Common Functions **
+// ***************************************
+
+// Apply LED color changes
+void showStrip() {
+ #ifdef ADAFRUIT_NEOPIXEL_H 
+   // NeoPixel
+   strip.show();
+ #endif
+ #ifndef ADAFRUIT_NEOPIXEL_H
+   // FastLED
+   FastLED.show();
+ #endif
+}
+
+// Set a LED color (not yet visible)
+void setPixel(int Pixel, byte red, byte green, byte blue) {
+ #ifdef ADAFRUIT_NEOPIXEL_H 
+   // NeoPixel
+   strip.setPixelColor(Pixel, strip.Color(red, green, blue));
+ #endif
+ #ifndef ADAFRUIT_NEOPIXEL_H 
+   // FastLED
+   leds[Pixel].r = red;
+   leds[Pixel].g = green;
+   leds[Pixel].b = blue;
+ #endif
+}
+
+// Set all LEDs to a given color and apply it (visible)
+void setAll(byte red, byte green, byte blue) {
+  for(int i = 0; i < NUM_LEDS; i++ ) {
+    setPixel(i, red, green, blue); 
+  }
+  showStrip();
 }
