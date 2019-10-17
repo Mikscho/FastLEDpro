@@ -23,6 +23,8 @@ CRGB leds[NUM_LEDS];
 // inspired by the Fast LED examples!
 // see https://github.com/FastLED/FastLED
 uint8_t currentAnimation = 0;
+int counter = 0;
+int fader = 0;
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
@@ -63,7 +65,7 @@ void setup(void) {
 }
 
 typedef void (*Animations[])();
-Animations animations = { confetti, rainbow, cloudSlowBeatWave, rainbowBlueTone, sinelon, juggle, rainbowRedTone, bpm, Strobe, meteorRain };
+Animations animations = {confetti, rainbow, cloudSlowBeatWave, rainbowBlueTone, sinelon, juggle, rainbowRedTone, bpm, Strobe, meteorRain, RGBLoop, FadeInOutR, FadeInOutG, FadeInOutB, FadeInOutW, black };
 
 void loop(void) {
   int packetSize = Udp.parsePacket();
@@ -79,14 +81,23 @@ void loop(void) {
     packetBuffer[n] = 0;
     Serial.println("Contents:");
     Serial.println(packetBuffer);
-    if(packetBuffer != "favicon.ico"){
-      String packet = String(packetBuffer);
-  	  switchPattern((packet).toInt());
-    }
+    String packet = String(packetBuffer);
+  	switchPattern((packet).toInt());
   }
-
-  animations[currentAnimation]();
   
+  //Alle +-5 Minuten wird die Animation gewechselt
+  animations[currentAnimation]();
+  counter += 1;
+  if(counter >= 30000){
+    currentAnimation = (currentAnimation + 1) % ARRAY_SIZE(animations);
+    counter = 0;
+  }
+  if(fader == 255){
+    fader += 255;
+  }
+  if(fader == 256){
+    fader -= 255;
+  }
   FastLED.show();  
   FastLED.delay(1000/FRAMES_PER_SECOND); 
 }
@@ -124,6 +135,21 @@ void switchPattern(int criteria){
     case 9:    //meteorRain
       currentAnimation = criteria;
       break;
+    case 10:  //RGBLoop
+      currentAnimation = criteria;
+      break;
+    case 11:  //FadeInOutR
+      currentAnimation = criteria;
+      break;
+    case 12:  //FadeInOutG
+      currentAnimation = criteria;
+      break;
+    case 13:  //FadeInOutB
+      currentAnimation = criteria;
+      break;
+    case 14:  //FadeInOutW
+      currentAnimation = criteria;
+      break;
     case 100:    //next
       currentAnimation = (currentAnimation + 1) % ARRAY_SIZE(animations);
       break;
@@ -136,9 +162,22 @@ void switchPattern(int criteria){
     case 202:    //Brightness 16
       FastLED.setBrightness(16);
       break;
+    case 203:    //Brightness 32
+      FastLED.setBrightness(32);
+      break;
+    case 204:    //Brightness 64
+      FastLED.setBrightness(64);
+      break;
+    case 205:    //Brightness 100
+      FastLED.setBrightness(100);
+      break;
+    case 1000:  //Black, nothing
+      currentAnimation = ARRAY_SIZE(animations) -1;
+      break;
     default:
       break;
   }
+  counter = 0;
 }
 
 void rainbow() {
@@ -228,6 +267,9 @@ void Strobe(){
  delay(EndPause);
 }
 
+void black(){
+  setAll(0,0,0);
+}
 
 void meteorRain() {
   byte red = 0xff; byte green = 0x00; byte blue = 0x12; byte meteorSize = 10; byte meteorTrailDecay = 64; boolean meteorRandomDecay = true; int SpeedDelay = 30;
@@ -278,6 +320,83 @@ void fadeToBlack(int ledNo, byte fadeValue) {
    // FastLED
    leds[ledNo].fadeToBlackBy( fadeValue );
  #endif  
+}
+
+void RGBLoop(){
+  for(int j = 0; j < 3; j++ ) { 
+    // Fade IN
+    for(int k = 0; k < 256; k++) { 
+      switch(j) { 
+        case 0: setAll(k,0,0); break;
+        case 1: setAll(0,k,0); break;
+        case 2: setAll(0,0,k); break;
+      }
+      showStrip();
+      delay(3);
+    }
+    // Fade OUT
+    for(int k = 255; k >= 0; k--) { 
+      switch(j) { 
+        case 0: setAll(k,0,0); break;
+        case 1: setAll(0,k,0); break;
+        case 2: setAll(0,0,k); break;
+      }
+      showStrip();
+      delay(3);
+    }
+  }
+}
+
+void FadeInOutR(){
+  if(fader < 255){
+    FadeIn(255, 0, 0);
+  }else{
+    FadeOut(255, 0, 0);
+  }
+}
+
+void FadeInOutW(){
+  if(fader < 255){
+    FadeIn(255, 255, 255);
+  }else{
+    FadeOut(255, 255, 255);
+  }
+}
+
+void FadeInOutB(){
+  if(fader < 255){
+    FadeIn(0, 0, 255);
+  }else{
+    FadeOut(0, 0, 255);
+  }
+}
+
+void FadeInOutG(){
+  if(fader < 255){
+    FadeIn(0, 255, 0);
+  }else{
+    FadeOut(0, 255, 0);
+  }
+}
+
+void FadeIn(int red, int green, int blue){
+  float r, g, b;
+  r = (fader/256.0)*red;
+  g = (fader/256.0)*green;
+  b = (fader/256.0)*blue;
+  setAll(r,g,b);
+  showStrip();
+  fader += 1;
+}
+
+void FadeOut(int red, int green, int blue){
+  float r, g, b;
+  r = ((fader-255)/256.0)*red;
+  g = ((fader-255)/256.0)*green;
+  b = ((fader-255)/256.0)*blue;
+  setAll(r,g,b);
+  showStrip();
+  fader -= 2;
 }
 
 // ***************************************
