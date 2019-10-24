@@ -2,8 +2,9 @@
 <html>
 <head>
     <title>LED Controller</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' media='screen'>
-
+    <--link rel="stylesheet" href="../static/style.css/"-->
 </head>
 <body>
 <h1>LED Controller</h1>
@@ -12,29 +13,28 @@
     <div class='panel-body'>
             <div class='row'>
                 <div class='col-sm-4 btn-group-vertical' role='group'>
-                    <button class='btn btn-primary' id='buttnext'>Next</button>
-                    <button class='btn btn-primary' id='buttlast'>Last</button>
-                    <button class='btn btn-primary' id='buttconfetti'>Confetti</button>
-                    <button class='btn btn-primary' id='buttrainbow'>Rainbow</button>
-                    <button class='btn btn-primary' id='buttcloudSlowBeatWave'>CloudSlowBeatWave</button>
-                    <button class='btn btn-primary' id='buttrainbowBT'>RainbowBlueTone</button>
-                    <button class='btn btn-primary' id='buttsinelon'>Sinelon</button>
-                    <button class='btn btn-primary' name='151' type='submit'>CycleColors</button>
-                    <button class='btn btn-primary' name='305' type='submit'>Plasma</button>
+					<button class='btn btn-primary' onclick="location.href='/1000'">Black</button>
+                    <button class='btn btn-primary' onclick="location.href='/100'">Next</button>
+                    <button class='btn btn-primary' onclick="location.href='/101'">Last</button>
+                    <button class='btn btn-primary' onclick="location.href='/0'">Confetti</button>
+                    <button class='btn btn-primary' onclick="location.href='/1'">Rainbow</button>
+                    <button class='btn btn-primary' onclick="location.href='/2'">CloudSlowBeatWave</button>
+                    <button class='btn btn-primary' onclick="location.href='/3'">Fire</button>
+                    <button class='btn btn-primary' onclick="location.href='/4'">Sinelon</button>
+                    <button class='btn btn-primary' onclick="location.href='/5'">Juggle</button>
+                    <button class='btn btn-primary' onclick="location.href='/6'">CylonBounce</button>
                 </div>
                 <div class='col-sm-4 btn-group-vertical'>
-                    <!--button class='btn btn-primary' name='201' type='submit'>Pixel Shift Right</button-->
-                    <!--button class='btn btn-primary' name='202' type='submit'>Pixel Shift Left</button-->
-                    <!--button class='btn btn-primary' name='203' type='submit'>Pixel Bounce</button-->
-                    <button class='btn btn-primary' name='211' type='submit'>Pixel Smooth Shift Right</button>
-                    <button class='btn btn-primary' name='212' type='submit'>Pixel Smooth Shift Left</button>
-                    <button class='btn btn-primary' name='213' type='submit'>Pixel Smooth Bounce</button>
-                    <button class='btn btn-primary' name='221' type='submit'>Comet</button>
-                    <button class='btn btn-primary' name='222' type='submit'>Comet (colored)</button>
-                    <button class='btn btn-primary' name='241' type='submit'>Moving Bars</button>
-                    <button class='btn btn-primary' name='242' type='submit'>Moving Gradient</button>
-                    <button class='btn btn-primary' name='251' type='submit'>Larson Scanner</button>
-                    <button class='btn btn-primary' name='252' type='submit'>Larson Scanner 2</button>
+                    <button class='btn btn-primary' onclick="location.href='/7'">BPM</button>
+                    <button class='btn btn-primary' onclick="location.href='/8'">Strobe</button>
+                    <button class='btn btn-primary' onclick="location.href='/9'">MeteorRain</button>
+                    <button class='btn btn-primary' onclick="location.href='/10'">RGBLoop</button>
+                    <button class='btn btn-primary' onclick="location.href='/11'">FadeInOut Red</button>
+                    <button class='btn btn-primary' onclick="location.href='/12'">FadeInOut Green</button>
+                    <button class='btn btn-primary' onclick="location.href='/13'">FadeInOut Blue</button>
+                    <button class='btn btn-primary' onclick="location.href='/14'">FadeInOut White</button>
+                    <button class='btn btn-primary' onclick="location.href='/15'">Twinkle</button>
+                    <button class='btn btn-primary' onclick="location.href='/16'">TwinkleRandom</button>
                 </div>
                 <div class='col-sm-4 btn-group-vertical'>
                     <button class='btn btn-primary' name='301' type='submit'>FadeIn</button>
@@ -50,21 +50,89 @@
             </div>
     </div>
 </div>
-
-
 <div class='row'>
 <div class='col-sm-4'>
     <div class='panel panel-default'>
         <div class='panel-heading'>Brightness</div>
         <div class='panel-body' class='btn-group' role='group'>
-            <form action='/brightness/' method='post'>
-                <button class='btn btn-primary' name='8' type='submit'>20%</button>
-                <button class='btn btn-primary' name='16' type='submit'>40%</button>
-                <button class='btn btn-primary' name='32' type='submit'>60%</button>
-                <button class='btn btn-primary' name='64' type='submit'>80%</button>
-                <button class='btn btn-primary' name='100' type='submit'>100%</button>
-            </form>
+			<button class='btn btn-primary' onclick="location.href='/201'">20%</button>
+			<button class='btn btn-primary' onclick="location.href='/202'">40%</button>
+			<button class='btn btn-primary' onclick="location.href='/203'">60%</button>
+			<button class='btn btn-primary' onclick="location.href='/204'">80%</button>
+			<button class='btn btn-primary' onclick="location.href='/205'">100%</button>
         </div>
     </div>
+</div>
+</div>
+<div class='row'>
+<div class='col-sm-4'>
+    <div class='panel panel-default'>
+        <div class='panel-heading'>Palette</div>
+        <div class='panel-body' class='btn-group' role='group'>
+			<button class='btn btn-primary' onclick="location.href='/401'">CloudColors</button>
+			<button class='btn btn-primary' onclick="location.href='/402'">LavaColors</button>
+			<button class='btn btn-primary' onclick="location.href='/403'">OceanColors</button>
+			<button class='btn btn-primary' onclick="location.href='/404'">ForestColors</button>
+			<button class='btn btn-primary' onclick="location.href='/405'">PartyColors</button>
+			<button class='btn btn-primary' onclick="location.href='/406'">HeatColors</button>
+        </div>
+    </div>
+</div>
+</div>
+<div class='row'>
+<div class="panel panel-default">
+	<div class="panel-heading">Color</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-sm-12 btn-group" role="group">
+					<button class="btn btn-primary" onclick="location.href='/301'" >White</button>
+					<button class="btn btn-primary" onclick="location.href='/302'">Red</button>
+					<button class="btn btn-primary" onclick="location.href='/303'">Gold</button>
+					<button class="btn btn-primary" onclick="location.href='/304'">Orange</button>
+					<button class="btn btn-primary" onclick="location.href='/305'">Crimson</button>
+					<button class="btn btn-primary" onclick="location.href='/306'">Magenta</button>
+					<button class="btn btn-primary" onclick="location.href='/307'">Violet</button>
+					<button class="btn btn-primary" onclick="location.href='/308'">Purple</button>
+					<button class="btn btn-primary" onclick="location.href='/309'">Blue</button>
+					<button class="btn btn-primary" onclick="location.href='/310'">Cyan</button>
+					<button class="btn btn-primary" onclick="location.href='/311'">Teal</button>
+					<button class="btn btn-primary" onclick="location.href='/312'">Turquoise</button>
+					<button class="btn btn-primary" onclick="location.href='/313'">Green</button>
+					<button class="btn btn-primary" onclick="location.href='/314'">Yellow</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class='row'>
+<div class="panel panel-default">
+    <div class="panel-heading">Temperature</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-sm-12 btn-group" role="group">
+					<button class="btn btn-primary" onclick="location.href='/500'">UncorrectedTemperature</button>
+					<button class="btn btn-primary" onclick="location.href='/501'">Candle</button>
+					<button class="btn btn-primary" onclick="location.href='/502'">Tungsten40W</button>
+					<button class="btn btn-primary" onclick="location.href='/503'">Tungsten100W</button>
+					<button class="btn btn-primary" onclick="location.href='/504'">Halogen</button>
+					<button class="btn btn-primary" onclick="location.href='/505'">CarbonArc</button>
+					<button class="btn btn-primary" onclick="location.href='/506'">HighNoonSun</button>
+					<button class="btn btn-primary" onclick="location.href='/507'">DirectSunlight</button>
+					<button class="btn btn-primary" onclick="location.href='/508'">OvercastSky</button>
+					<button class="btn btn-primary" onclick="location.href='/509'">ClearBlueSky</button>
+					<button class="btn btn-primary" onclick="location.href='/510'">WarmFluorescent</button>
+					<button class="btn btn-primary" onclick="location.href='/511'">StandardFluorescent</button>
+					<button class="btn btn-primary" onclick="location.href='/512'">CoolWhiteFluorescent</button>
+					<button class="btn btn-primary" onclick="location.href='/513'">FullSpectrumFluorescent</button>
+					<button class="btn btn-primary" onclick="location.href='/514'">GrowLightFluorescent</button>
+					<button class="btn btn-primary" onclick="location.href='/515'">BlackLightFluorescent</button>
+					<button class="btn btn-primary" onclick="location.href='/516'">MercuryVapor</button>
+					<button class="btn btn-primary" onclick="location.href='/517'">SodiumVapor</button>
+					<button class="btn btn-primary" onclick="location.href='/518'">MetalHalide</button>
+					<button class="btn btn-primary" onclick="location.href='/519'">HighPressureSodium</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 </body>
