@@ -18,13 +18,10 @@ FASTLED_USING_NAMESPACE
 
 CRGB leds[NUM_LEDS];
 CRGBSet defleds(leds, NUM_LEDS);
-CRGBSet leds1(defleds(0,(NUM_LEDS / 5)-1));
-CRGBSet leds2(defleds((NUM_LEDS / 5),(NUM_LEDS / 5)*2-1));
-CRGBSet leds3(defleds((NUM_LEDS / 5)*2,(NUM_LEDS / 5)*3-1));
-CRGBSet leds4(defleds((NUM_LEDS / 5)*3,(NUM_LEDS / 5)*3-1));
-CRGBSet leds5(defleds((NUM_LEDS / 5)*4,(NUM_LEDS -1)));
+CRGBSet leds1(defleds(0,(NUM_LEDS / 3)-1));
+CRGBSet leds2(defleds((NUM_LEDS / 3),(NUM_LEDS / 3)*2-1));
+CRGBSet leds3(defleds((NUM_LEDS / 3)*2,(NUM_LEDS / 3)*3-1));
 CRGBSet all(defleds(0,(NUM_LEDS -1)));
-
 
 /* int LEDperSEQ = NUM_LEDS / Seqs;
  * int Seqs = 5;
@@ -36,7 +33,7 @@ CRGBSet all(defleds(0,(NUM_LEDS -1)));
  *    CRGBSet[i] = (defleds(i * LEDperSEQ, (i+1)*LEDperSEQ -1))
  * }
  */
-struct CRGB * ledsarry[] ={leds1, leds2, leds3, leds4, leds5};
+struct CRGB * ledsarry[] ={leds1, leds2, leds3};
 
 #define BRIGHTNESS         30
 #define FRAMES_PER_SECOND  120
@@ -46,7 +43,9 @@ struct CRGB * ledsarry[] ={leds1, leds2, leds3, leds4, leds5};
 uint8_t currentAnimation = 0;
 int counter = 0;
 int fader = 0;
-#define TEMPERATURE UncorrectedTemperature
+
+CRGBPalette16 currentPalette;
+ColorTemperature Temperature = UncorrectedTemperature;
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
@@ -87,7 +86,7 @@ void setup(void) {
 }
 
 typedef void (*Animations[])();
-Animations animations = {confetti, rainbow, cloudSlowBeatWave, rainbow, sinelon, juggle, rainbow, bpm, Strobe, meteorRain, RGBLoop, FadeInOutR, FadeInOutG, FadeInOutB, FadeInOutW, black };
+Animations animations = {confetti, rainbow, cloudSlowBeatWave, fire, sinelon, juggle, CylonBounce, bpm, Strobe, meteorRain, RGBLoop, FadeInOutR, FadeInOutG, FadeInOutB, FadeInOutW, twinkle, TwinkleRandom, black };
 
 void loop(void) {
   int packetSize = Udp.parsePacket();
@@ -136,8 +135,8 @@ void switchPattern(int criteria){
     case 2:    //cloudSlowBeatWave
       currentAnimation = criteria;
       break;
-    case 3:    //rainbowBT
-      //currentAnimation = criteria;
+    case 3:    //Fire
+      currentAnimation = criteria;
       break;
     case 4:    //sinelon
       currentAnimation = criteria;
@@ -145,8 +144,8 @@ void switchPattern(int criteria){
     case 5:    //juggle
       currentAnimation = criteria;
       break;
-    case 6:    //rainbowRT
-      //currentAnimation = criteria;
+    case 6:    //CylonBounce
+      currentAnimation = criteria;
       break;
     case 7:    //bpm
       currentAnimation = criteria;
@@ -172,6 +171,12 @@ void switchPattern(int criteria){
     case 14:  //FadeInOutW
       currentAnimation = criteria;
       break;
+    case 15:  //Twinkle
+      currentAnimation = criteria;
+      break;
+    case 16:  //TwinkleRandom
+      currentAnimation = criteria;
+      break;
     case 100:    //next
       currentAnimation = (currentAnimation + 1) % ARRAY_SIZE(animations);
       break;
@@ -194,64 +199,64 @@ void switchPattern(int criteria){
       FastLED.setBrightness(100);
       break;
     case 500:
-      #define TEMPERATURE UncorrectedTemperature
+      Temperature = UncorrectedTemperature;
       break;
     case 501:
-      #define TEMPERATURE Candle
+      Temperature = Candle;
       break;
     case 502:
-      #define TEMPERATURE Tungsten40W
+      Temperature = Tungsten40W;
       break;
     case 503:
-      #define TEMPERATURE Tungsten100W
+      Temperature = Tungsten100W;
       break;
     case 504:
-      #define TEMPERATURE Halogen
+      Temperature = Halogen;
       break;
     case 505:
-      #define TEMPERATURE CarbonArc
+      Temperature = CarbonArc;
       break;
     case 506:
-      #define TEMPERATURE HighNoonSun
+      Temperature = HighNoonSun;
       break;
     case 507:
-      #define TEMPERATURE DirectSunlight
+      Temperature = DirectSunlight;
       break;
     case 508:
-      #define TEMPERATURE OvercastSky
+      Temperature = OvercastSky;
       break;
     case 509:
-      #define TEMPERATURE ClearBlueSky
+      Temperature = ClearBlueSky;
       break;
     case 510:
-      #define TEMPERATURE WarmFluorescent
+      Temperature = WarmFluorescent;
       break;
     case 511:
-      #define TEMPERATURE StandardFluorescent
+      Temperature = StandardFluorescent;
       break;
     case 512:
-      #define TEMPERATURE CoolWhiteFluorescent
+      Temperature = CoolWhiteFluorescent;
       break;
     case 513:
-      #define TEMPERATURE FullSpectrumFluorescent
+      Temperature = FullSpectrumFluorescent;
       break;
     case 514:
-      #define TEMPERATURE GrowLightFluorescent
+      Temperature = GrowLightFluorescent;
       break;
     case 515:
-      #define TEMPERATURE BlackLightFluorescent
+      Temperature = BlackLightFluorescent;
       break;
     case 516:
-      #define TEMPERATURE MercuryVapor
+      Temperature = MercuryVapor;
       break;
     case 517:
-      #define TEMPERATURE SodiumVapor
+      Temperature = SodiumVapor;
       break;
     case 518:
-      #define TEMPERATURE MetalHalide
+      Temperature = MetalHalide;
       break;
     case 519:
-      #define TEMPERATURE HighPressureSodium
+      Temperature = HighPressureSodium;
       break;
     case 1000:  //Black, nothing
       currentAnimation = ARRAY_SIZE(animations) -1;
@@ -266,7 +271,7 @@ void rainbow() {
   // cycle forward with a rainbow
   static uint8_t hue = 0;
   fill_rainbow(leds, NUM_LEDS, ++hue, 5);
-  FastLED.setTemperature(TEMPERATURE);
+  FastLED.setTemperature(Temperature);
 }
 
 void confetti() {
@@ -275,18 +280,18 @@ void confetti() {
   int pos = random16(NUM_LEDS);
   static uint8_t hue = 0;
   leds[pos] += CHSV(--hue + random8(64), 200, 255);
-  FastLED.setTemperature(TEMPERATURE);
+  FastLED.setTemperature(Temperature);
 }
 
 void sinelon() {
-  for(int i=0; i < 5; i++){
+  for(int i=0; i < 3; i++){
     // a colored dot sweeping back and forth, with fading trails
-    fadeToBlackBy(ledsarry[i], 60, 20);
-    int pos = beatsin16(13, 0, 59 );
+    fadeToBlackBy(ledsarry[i], 100, 20);
+    int pos = beatsin16(13, 0, 99 );
     static uint8_t hue = 0;
     ledsarry[i][pos] += CHSV(++hue, 255, 192);
   }
-  FastLED.setTemperature(TEMPERATURE);
+  FastLED.setTemperature(Temperature);
 }
 
 void bpm() {
@@ -301,7 +306,7 @@ void bpm() {
     if (x < 0) x = NUM_LEDS - x;
     leds[i] = ColorFromPalette(palette, hue+i*2 % NUM_LEDS, x);
   }
-  FastLED.setTemperature(TEMPERATURE);
+  FastLED.setTemperature(Temperature);
 }
 
 void juggle() {
@@ -312,7 +317,7 @@ void juggle() {
     leds[beatsin16(i+7, 0, NUM_LEDS-1 )] |= CHSV(dothue, 200, 255);
     dothue += 32;
   }
-  FastLED.setTemperature(TEMPERATURE);
+  FastLED.setTemperature(Temperature);
 }
 
 void cloudSlowBeatWave() {
@@ -320,7 +325,7 @@ void cloudSlowBeatWave() {
     int colorIndex = beat8(30  + i % 40) + ease8InOutQuad(i + NUM_LEDS);
     leds[i] = ColorFromPalette(CloudColors_p, colorIndex, NUM_LEDS, LINEARBLEND);
   }
-  FastLED.setTemperature(TEMPERATURE);
+  FastLED.setTemperature(Temperature);
 }
 
 void Strobe(){
@@ -333,12 +338,51 @@ void Strobe(){
     showStrip();
     delay(FlashDelay);
   }
- 
+ FastLED.setTemperature(Temperature);
  delay(EndPause);
 }
 
 void black(){
   setAll(0,0,0);
+}
+
+void fire() {
+  int Cooling = 55;
+  int Sparking = 120;
+  int SpeedDelay = 15;
+  static byte heat[NUM_LEDS];
+  int cooldown;
+  
+  // Step 1.  Cool down every cell a little
+  for( int i = 0; i < NUM_LEDS; i++) {
+    cooldown = random(0, ((Cooling * 10) / NUM_LEDS) + 2);
+    
+    if(cooldown>heat[i]) {
+      heat[i]=0;
+    } else {
+      heat[i]=heat[i]-cooldown;
+    }
+  }
+  
+  // Step 2.  Heat from each cell drifts 'up' and diffuses a little
+  for( int k= NUM_LEDS - 1; k >= 2; k--) {
+    heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2]) / 3;
+  }
+    
+  // Step 3.  Randomly ignite new 'sparks' near the bottom
+  if( random(255) < Sparking ) {
+    int y = random(7);
+    heat[y] = heat[y] + random(160,255);
+    //heat[y] = random(160,255);
+  }
+
+  // Step 4.  Convert heat to LED colors
+  for( int j = 0; j < NUM_LEDS; j++) {
+    setPixelHeatColor(j, heat[j] );
+  }
+  FastLED.setTemperature(Temperature);
+  showStrip();
+  delay(SpeedDelay);
 }
 
 void meteorRain() {
@@ -365,6 +409,7 @@ void meteorRain() {
     showStrip();
     delay(SpeedDelay);
   }
+  FastLED.setTemperature(UncorrectedTemperature);
 }
 
 // used by meteorrain
@@ -392,6 +437,35 @@ void fadeToBlack(int ledNo, byte fadeValue) {
  #endif  
 }
 
+void CylonBounce(){
+  byte red = 0xff; byte green = 0xff; byte blue = 0xff; int EyeSize = 4; int SpeedDelay = 10; int ReturnDelay = 50;
+  for(int i = 0; i < NUM_LEDS-EyeSize-2; i++) {
+    setAll(0,0,0);
+    setPixel(i, red/10, green/10, blue/10);
+    for(int j = 1; j <= EyeSize; j++) {
+      setPixel(i+j, red, green, blue); 
+    }
+    setPixel(i+EyeSize+1, red/10, green/10, blue/10);
+    showStrip();
+    delay(SpeedDelay);
+  }
+
+  delay(ReturnDelay);
+
+  for(int i = NUM_LEDS-EyeSize-2; i > 0; i--) {
+    setAll(0,0,0);
+    setPixel(i, red/10, green/10, blue/10);
+    for(int j = 1; j <= EyeSize; j++) {
+      setPixel(i+j, red, green, blue); 
+    }
+    setPixel(i+EyeSize+1, red/10, green/10, blue/10);
+    showStrip();
+    delay(SpeedDelay);
+  }
+  FastLED.setTemperature(Temperature);
+  delay(ReturnDelay);
+}
+
 void RGBLoop(){
   for(int j = 0; j < 3; j++ ) { 
     // Fade IN
@@ -415,6 +489,7 @@ void RGBLoop(){
       delay(3);
     }
   }
+  FastLED.setTemperature(Temperature);
 }
 
 void FadeInOutR(){
@@ -455,6 +530,7 @@ void FadeIn(int red, int green, int blue){
   g = (fader/256.0)*green;
   b = (fader/256.0)*blue;
   setAll(r,g,b);
+  FastLED.setTemperature(Temperature);
   showStrip();
   fader += 1;
 }
@@ -465,8 +541,41 @@ void FadeOut(int red, int green, int blue){
   g = ((fader-255)/256.0)*green;
   b = ((fader-255)/256.0)*blue;
   setAll(r,g,b);
+  FastLED.setTemperature(Temperature);
   showStrip();
   fader -= 2;
+}
+
+void twinkle() {
+  byte red = 0xff; byte green = 0xff; byte blue = 0xff; int Count = 10; int SpeedDelay = 100; boolean OnlyOne = false;
+  setAll(0,0,0);
+  
+  for (int i=0; i<Count; i++) {
+     setPixel(random(NUM_LEDS),red,green,blue);
+     showStrip();
+     delay(SpeedDelay);
+     if(OnlyOne) { 
+       setAll(0,0,0); 
+     }
+   }
+  FastLED.setTemperature(Temperature);
+  delay(SpeedDelay);
+}
+
+void TwinkleRandom() {
+  int Count = 20; int SpeedDelay = 100; boolean OnlyOne = false;
+  setAll(0,0,0);
+  
+  for (int i=0; i<Count; i++) {
+     setPixel(random(NUM_LEDS),random(0,255),random(0,255),random(0,255));
+     showStrip();
+     delay(SpeedDelay);
+     if(OnlyOne) { 
+       setAll(0,0,0); 
+     }
+   }
+  FastLED.setTemperature(Temperature);
+  delay(SpeedDelay);
 }
 
 // ***************************************
@@ -505,4 +614,22 @@ void setAll(byte red, byte green, byte blue) {
     setPixel(i, red, green, blue); 
   }
   showStrip();
+}
+
+void setPixelHeatColor (int Pixel, byte temperature) {
+  // Scale 'heat' down from 0-255 to 0-191
+  byte t192 = round((temperature/255.0)*191);
+ 
+  // calculate ramp up from
+  byte heatramp = t192 & 0x3F; // 0..63
+  heatramp <<= 2; // scale up to 0..252
+ 
+  // figure out which third of the spectrum we're in:
+  if( t192 > 0x80) {                     // hottest
+    setPixel(Pixel, 255, 255, heatramp);
+  } else if( t192 > 0x40 ) {             // middle
+    setPixel(Pixel, 255, heatramp, 0);
+  } else {                               // coolest
+    setPixel(Pixel, heatramp, 0, 0);
+  }
 }
