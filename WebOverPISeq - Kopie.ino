@@ -14,7 +14,7 @@ FASTLED_USING_NAMESPACE
 #define DATA_PIN    6
 #define LED_TYPE    NEOPIXEL
 #define COLOR_ORDER GRB
-#define NUM_LEDS    300
+#define NUM_LEDS    85
 
 CRGB leds[NUM_LEDS];
 CRGBSet defleds(leds, NUM_LEDS);
@@ -88,7 +88,7 @@ void setup(void) {
 typedef void (*Animations[])();
 Animations animations = {confetti, rainbow, cloudSlowBeatWave, fire, sinelon, juggle, CylonBounce, bpm, Strobe, meteorRain, RGBLoop, FadeInOutR, FadeInOutG, FadeInOutB, FadeInOutW, twinkle, TwinkleRandom, black };
 
-void loop(void) {
+void recPack(){
   int packetSize = Udp.parsePacket();
   if (packetSize) {
     Serial.printf("Received packet of size %d from %s:%d\n    (to %s:%d, free heap = %d B)\n",
@@ -103,9 +103,12 @@ void loop(void) {
     Serial.println("Contents:");
     Serial.println(packetBuffer);
     String packet = String(packetBuffer);
-  	switchPattern((packet).toInt());
+    switchPattern((packet).toInt());
   }
-  
+}
+
+void loop(void) {
+  recPack();
   //Alle +-5 Minuten wird die Animation gewechselt
   animations[currentAnimation]();
   counter += 1;
@@ -337,6 +340,7 @@ void Strobe(){
     setAll(0,0,0);
     showStrip();
     delay(FlashDelay);
+    recPack();
   }
  FastLED.setTemperature(Temperature);
  delay(EndPause);
@@ -363,12 +367,12 @@ void fire() {
       heat[i]=heat[i]-cooldown;
     }
   }
-  
   // Step 2.  Heat from each cell drifts 'up' and diffuses a little
   for( int k= NUM_LEDS - 1; k >= 2; k--) {
     heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2]) / 3;
   }
-    
+
+  recPack();
   // Step 3.  Randomly ignite new 'sparks' near the bottom
   if( random(255) < Sparking ) {
     int y = random(7);
@@ -407,6 +411,7 @@ void meteorRain() {
     }
    
     showStrip();
+    recPack();
     delay(SpeedDelay);
   }
   FastLED.setTemperature(UncorrectedTemperature);
@@ -447,6 +452,7 @@ void CylonBounce(){
     }
     setPixel(i+EyeSize+1, red/10, green/10, blue/10);
     showStrip();
+    recPack();
     delay(SpeedDelay);
   }
 
@@ -460,6 +466,7 @@ void CylonBounce(){
     }
     setPixel(i+EyeSize+1, red/10, green/10, blue/10);
     showStrip();
+    recPack();
     delay(SpeedDelay);
   }
   FastLED.setTemperature(Temperature);
@@ -476,6 +483,7 @@ void RGBLoop(){
         case 2: setAll(0,0,k); break;
       }
       showStrip();
+      recPack();
       delay(3);
     }
     // Fade OUT
@@ -486,6 +494,7 @@ void RGBLoop(){
         case 2: setAll(0,0,k); break;
       }
       showStrip();
+      recPack();
       delay(3);
     }
   }
@@ -559,6 +568,7 @@ void twinkle() {
      }
    }
   FastLED.setTemperature(Temperature);
+  recPack();
   delay(SpeedDelay);
 }
 
@@ -575,6 +585,7 @@ void TwinkleRandom() {
      }
    }
   FastLED.setTemperature(Temperature);
+  recPack();
   delay(SpeedDelay);
 }
 
