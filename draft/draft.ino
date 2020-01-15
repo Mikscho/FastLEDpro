@@ -34,7 +34,7 @@ struct CRGB * ledsarry[] ={ledBL, ledU, ledBR, ledAOR, ledAUR, ledVR, ledVL, led
 uint8_t currentAnimation = 0;
 int counter = 0;
 int fader = 0;
-uint32_t currcolor = CRGB::White;
+CRGB currcolor = CRGB::White;
 
 CRGBPalette16 currentPalette = RainbowColors_p;
 ColorTemperature Temperature = UncorrectedTemperature;
@@ -402,9 +402,9 @@ void cloudSlowBeatWave() {
 }
 
 void Strobe(){
-  byte red = ((currcolor >> 16) & 0xFF) / 255.0; byte green = ((currcolor >> 8) & 0xFF) / 255.0; byte blue = ((currcolor) & 0xFF) / 255.0; int StrobeCount = 10; int FlashDelay = 50; int EndPause = 500;
+  int StrobeCount = 10; int FlashDelay = 50; int EndPause = 500;
   for(int j = 0; j < StrobeCount; j++) {
-    setAll(red,green,blue);
+    setAll(currcolor);
     showStrip();
     delay(FlashDelay);
     black();
@@ -518,7 +518,7 @@ void fadeToBlack(int ledNo, byte fadeValue) {
 }
 
 void CylonBounce(){
-  byte red = ((currcolor >> 16) & 0xFF) / 255.0; byte green = ((currcolor >> 8) & 0xFF) / 255.0; byte blue = ((currcolor) & 0xFF) / 255.0; int EyeSize = 4; int SpeedDelay = 10; int ReturnDelay = 50;
+  byte red = currcolor.r; byte green = currcolor.g; byte blue = currcolor.b; int EyeSize = 4; int SpeedDelay = 10; int ReturnDelay = 50;
   for(int i = 0; i < NUM_LEDS-EyeSize-2; i++) {
     setAll(0,0,0);
     setPixel(i, red/10, green/10, blue/10);
@@ -577,7 +577,7 @@ void RGBLoop(){
 }
 
 void FadeInOut(){
-  byte red = ((currcolor >> 16) & 0xFF) / 255.0; byte green = ((currcolor >> 8) & 0xFF) / 255.0; byte blue = ((currcolor) & 0xFF) / 255.0;
+  byte red = currcolor.r; byte green = currcolor.g; byte blue = currcolor.b;
   recPack();
   if(fader < 255){
     FadeIn(red, green, blue);
@@ -671,7 +671,7 @@ void add_glitter()
 }
 
 void twinkle() {
-  byte red = ((currcolor >> 16) & 0xFF) / 255.0; byte green = ((currcolor >> 8) & 0xFF) / 255.0; byte blue = ((currcolor) & 0xFF) / 255.0; int Count = 10; int SpeedDelay = 100;
+  byte red = currcolor.r; byte green = currcolor.g; byte blue = currcolor.b; int Count = 10; int SpeedDelay = 100;
   setAll(0,0,0);
   
   for (int i=0; i<Count; i++) {
@@ -736,8 +736,8 @@ void setAll(byte red, byte green, byte blue) {
   showStrip();
 }
 
-void setAll(uint32_t color){
-  byte red = ((currcolor >> 16) & 0xFF) / 255.0; byte green = ((currcolor >> 8) & 0xFF) / 255.0; byte blue = ((currcolor) & 0xFF) / 255.0;
+void setAll(CRGB color){
+  byte red = color.r; byte green = color.g; byte blue = color.b;
   for(int i = 0; i < NUM_LEDS; i++ ) {
     setPixel(i, red, green, blue); 
   }
