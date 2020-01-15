@@ -26,18 +26,6 @@ CRGBSet ledVL(defleds(222, 253));
 CRGBSet ledAOL(defleds(254, 269));
 CRGBSet ledAUL(defleds(270, 285));
 
-//CRGBSet all(defleds(0,(NUM_LEDS -1)));
-
-/* int LEDperSEQ = NUM_LEDS / Seqs;
- * int Seqs = 5;
- * 
- * CRGB leds[NUM_LEDS];
- * CRGBSet defleds(leds, NUM_LEDS);
- * struct CRGB * ledsarry[] = new CRGBSet[5];
- * for(int i = 0; i < Seqs; i++){
- *    CRGBSet[i] = (defleds(i * LEDperSEQ, (i+1)*LEDperSEQ -1))
- * }
- */
 struct CRGB * ledsarry[] ={ledBL, ledU, ledBR, ledAOR, ledAUR, ledVR, ledVL, ledAOL, ledAUL};
 
 #define BRIGHTNESS         50
@@ -87,7 +75,7 @@ void setup(void) {
 }
 
 typedef void (*Animations[])();
-Animations animations = {confetti, rainbow, cloudSlowBeatWave, fire, sinelon, juggle, CylonBounce, bpm, Strobe, meteorRain, RGBLoop, FadeInOut, simpleColor, twinkle, TwinkleRandom, black };
+Animations animations = {confetti, rainbow, cloudSlowBeatWave, fire, sinelon, juggle, CylonBounce, bpm, Strobe, meteorRain, RGBLoop, FadeInOut, simpleColor, sunriseset, american, twinkle, TwinkleRandom, black };
 
 void recPack(){
   int packetSize = Udp.parsePacket();
@@ -169,6 +157,12 @@ void switchPattern(int criteria){
     case 12: //simpleColor
       currentAnimation = criteria;
       break;
+    case 13: //Sunrise/Sunset
+      currentAnimation = criteria;
+      break;
+    case 14: //American red/white/blue with glitter
+      currentAnimation = criteria;
+      break;
     case 15:  //Twinkle
       currentAnimation = criteria;
       break;
@@ -181,19 +175,19 @@ void switchPattern(int criteria){
     case 101:    //last
       currentAnimation = (currentAnimation - 1) % ARRAY_SIZE(animations);
       break;
-    case 201:
+    case 201:    //Brightness 20%
       FastLED.setBrightness(20);
       break;
-    case 202:    //Brightness 16
+    case 202:    //Brightness 40%
       FastLED.setBrightness(40);
       break;
-    case 203:    //Brightness 32
+    case 203:    //Brightness 60%
       FastLED.setBrightness(60);
       break;
-    case 204:    //Brightness 64
+    case 204:    //Brightness 80%
       FastLED.setBrightness(80);
       break;
-    case 205:    //Brightness 100
+    case 205:    //Brightness 100%
       FastLED.setBrightness(100);
       break;
     case 301:
@@ -364,10 +358,10 @@ void confetti() {
 }
 
 void sinelon() {
-  for(int i=0; i < sizeof(ledsarry); i++){
+  for(int i=0; i < ARRAY_SIZE(ledsarry); i++){
     // a colored dot sweeping back and forth, with fading trails
-    fadeToBlackBy(ledsarry[i], sizeof(ledsarry[i]), 20);
-    int pos = beatsin16(13, 0, sizeof(ledsarry[i]) -1 );
+    fadeToBlackBy(ledsarry[i], ARRAY_SIZE(ledsarry[i]), 20);
+    int pos = beatsin16(13, 0, ARRAY_SIZE(ledsarry[i]) -1 );
     static uint8_t hue = 0;
     ledsarry[i][pos] += CHSV(++hue, 255, 192);
   }
@@ -612,6 +606,68 @@ void FadeOut(int red, int green, int blue){
   FastLED.setTemperature(Temperature);
   showStrip();
   fader -= 2;
+}
+
+void sunriseset() {
+  static uint8_t heatIndex = 0; // start out at 0
+  for(int i = heatIndex; i < 255; i++){
+      setsun(heatIndex);
+      heatIndex = i;
+  }
+  for(int j = heatIndex; j > 0; j++){
+      setsun(heatIndex);
+      heatIndex = j;
+  }
+}
+
+//wird gebraucht für obige Animation
+void setsun(int heatIndex){
+      CRGB color = ColorFromPalette(HeatColors_p, heatIndex);
+      // fill the entire strip with the current color
+      fill_solid(leds, NUM_LEDS, color);
+      showStrip();
+      recPack();
+}
+
+
+void american(){
+  fill_stripes();
+  add_glitter();
+  showStrip();
+  recPack();
+}
+//for animation american
+void fill_stripes()
+{
+  CRGBPalette16 gPalette ( 
+    CRGB::Black, CRGB::Black, 
+    CRGB::Red,   CRGB::Red,  CRGB::Red,  CRGB::Red, 
+    CRGB::Gray,  CRGB::Gray, CRGB::Gray, CRGB::Gray,
+    CRGB::Blue,  CRGB::Blue, CRGB::Blue, CRGB::Blue,
+    CRGB::Black, CRGB::Black
+  );
+  static uint8_t startValue = 0;
+  startValue = startValue + 2;
+  
+  uint8_t value = startValue;  
+  for( int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = ColorFromPalette( gPalette, triwave8( value), 128, LINEARBLEND);
+    value += 7;
+  }
+}
+//for animation american
+void add_glitter()
+{
+  int chance_of_glitter =  5; // percent of the time that we add glitter
+  int number_of_glitters = 3; // number of glitter sparkles to add
+  
+  int r = random8(100);
+  if( r < chance_of_glitter ) {
+    for( int j = 0; j < number_of_glitters; j++) {
+      int pos = random16( NUM_LEDS);
+      leds[pos] = CRGB::White; // very bright glitter
+    }
+  }
 }
 
 void twinkle() {
