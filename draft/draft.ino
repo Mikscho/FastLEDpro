@@ -77,7 +77,7 @@ void setup(void) {
 typedef void (*Animations[])();
 Animations animations = {confetti, rainbow, cloudSlowBeatWave, fire, sinelon, juggle, CylonBounce, bpm, Strobe, meteorRain, RGBLoop, FadeInOut, simpleColor, sunriseset, american, twinkle, TwinkleRandom, black };
 
-void recPack(){
+int recPack(){
   int packetSize = Udp.parsePacket();
   if (packetSize) {
     Serial.printf("Received packet of size %d from %s:%d\n    (to %s:%d, free heap = %d B)\n",
@@ -94,6 +94,7 @@ void recPack(){
     String packet = String(packetBuffer);
     switchPattern((packet).toInt());
   }
+  return (packet).toInt();
 }
 
 void loop(void) {
@@ -410,7 +411,9 @@ void Strobe(){
     black();
     showStrip();
     delay(FlashDelay);
-    recPack();
+    if(recPack() < 200){
+      break;
+    }
   }
  FastLED.setTemperature(Temperature);
  delay(EndPause);
@@ -447,7 +450,7 @@ void fire() {
     heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2]) / 3;
   }
 
-  recPack();
+  if (recPack() < 200){return;}
   // Step 3.  Randomly ignite new 'sparks' near the bottom
   if( random(255) < Sparking ) {
     int y = random(7);
@@ -486,7 +489,7 @@ void meteorRain() {
     }
    
     showStrip();
-    recPack();
+    if(recPack()<200){return;}
     delay(SpeedDelay);
   }
   FastLED.setTemperature(UncorrectedTemperature);
@@ -527,8 +530,8 @@ void CylonBounce(){
     }
     setPixel(i+EyeSize+1, red/10, green/10, blue/10);
     showStrip();
-    recPack();
     delay(SpeedDelay);
+    if(recPack()<200){return;}
   }
 
   delay(ReturnDelay);
@@ -541,7 +544,7 @@ void CylonBounce(){
     }
     setPixel(i+EyeSize+1, red/10, green/10, blue/10);
     showStrip();
-    recPack();
+    if(recPack()<200){return;}
     delay(SpeedDelay);
   }
   FastLED.setTemperature(Temperature);
@@ -558,7 +561,7 @@ void RGBLoop(){
         case 2: setAll(0,0,k); break;
       }
       showStrip();
-      recPack();
+      if(recPack()<200){return;}
       delay(3);
     }
     // Fade OUT
@@ -569,7 +572,7 @@ void RGBLoop(){
         case 2: setAll(0,0,k); break;
       }
       showStrip();
-      recPack();
+      if(recPack()<200){return;}
       delay(3);
     }
   }
@@ -626,7 +629,7 @@ void setsun(int heatIndex){
       // fill the entire strip with the current color
       fill_solid(leds, NUM_LEDS, color);
       showStrip();
-      recPack();
+      if(recPack()<200){return;}
 }
 
 
@@ -634,7 +637,6 @@ void american(){
   fill_stripes();
   add_glitter();
   showStrip();
-  recPack();
 }
 //for animation american
 void fill_stripes()
@@ -680,7 +682,6 @@ void twinkle() {
      delay(SpeedDelay);
    }
   FastLED.setTemperature(Temperature);
-  recPack();
   delay(SpeedDelay);
 }
 
@@ -694,7 +695,6 @@ void TwinkleRandom() {
      delay(SpeedDelay);
    }
   FastLED.setTemperature(Temperature);
-  recPack();
   delay(SpeedDelay);
 }
 
