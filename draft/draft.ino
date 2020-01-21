@@ -75,7 +75,7 @@ void setup(void) {
 }
 
 typedef void (*Animations[])();
-Animations animations = {confetti, rainbow, cloudSlowBeatWave, fire, sinelon, juggle, CylonBounce, bpm, Strobe, meteorRain, RGBLoop, FadeInOut, simpleColor, sunriseset, american, twinkle, TwinkleRandom, black };
+Animations animations = {confetti, rainbow, cloudSlowBeatWave, fire, sinelon, juggle, CylonBounce, bpm, Strobe, meteorRain, RGBLoop, FadeInOut, simpleColor, sunriseset, american, twinkle, TwinkleRandom, setsimple, stroberandom, plasma, black };
 
 int recPack(){
   int packetSize = Udp.parsePacket();
@@ -93,8 +93,9 @@ int recPack(){
     Serial.println(packetBuffer);
     String packet = String(packetBuffer);
     switchPattern((packet).toInt());
+    if(packet){return (packet).toInt();}
   }
-  return (packet).toInt();
+  return 1000;
 }
 
 void loop(void) {
@@ -168,6 +169,18 @@ void switchPattern(int criteria){
       currentAnimation = criteria;
       break;
     case 16:  //TwinkleRandom
+      currentAnimation = criteria;
+      break;
+    case 17:  //simpleset
+      currentAnimation = criteria;
+      break;
+    case 18:  //StrobeRandom
+      currentAnimation = criteria;
+      break;
+    case 19:  //Plasma
+      currentAnimation = criteria;
+      break;
+    case 20:  //Ligthning
       currentAnimation = criteria;
       break;
     case 100:    //next
@@ -369,6 +382,16 @@ void sinelon() {
   FastLED.setTemperature(Temperature);
 }
 
+void setsimple(){
+  for(int i = 0; i < ARRAY_SIZE(ledsarry); i++){
+      ledsarry[i][0] = CRGB::Red;
+      ledsarry[i][5] = CRGB::Blue;
+      ledsarry[i][10] = CRGB::Aqua;
+      ledsarry[i][15] = CRGB::Green;
+      ledsarry[i][20] = CRGB::Yellow;
+  }
+}
+
 void bpm() {
   // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
   uint8_t BeatsPerMinute = 25;
@@ -405,18 +428,30 @@ void cloudSlowBeatWave() {
 void Strobe(){
   int StrobeCount = 10; int FlashDelay = 50; int EndPause = 500;
   for(int j = 0; j < StrobeCount; j++) {
-    setAll(currcolor);
-    showStrip();
-    delay(FlashDelay);
-    black();
-    showStrip();
-    delay(FlashDelay);
-    if(recPack() < 200){
-      break;
-    }
+    strobeani(currcolor.r,currcolor.g,currcolor.b);
+    if(recPack() < 200){break;}
   }
  FastLED.setTemperature(Temperature);
  delay(EndPause);
+}
+
+void stroberandom(){
+  int StrobeCount = 10; int FlashDelay = 50; int EndPause = 500;
+  for(int j = 0; j < StrobeCount; j++) {
+    strobeani(random(0,255),random(0,255),random(0,255));
+    if(recPack() < 200){break;}
+  }
+ FastLED.setTemperature(Temperature);
+ delay(EndPause);
+}
+
+void strobeani(byte red, byte green, byte blue){
+    setAll(red, green, blue);
+    showStrip();
+    delay(50);
+    black();
+    showStrip();
+    delay(50);
 }
 
 void black(){
@@ -617,6 +652,7 @@ void sunriseset() {
       setsun(heatIndex);
       heatIndex = i;
   }
+  if(recPack()<200){return;}
   for(int j = heatIndex; j > 0; j++){
       setsun(heatIndex);
       heatIndex = j;
@@ -629,7 +665,6 @@ void setsun(int heatIndex){
       // fill the entire strip with the current color
       fill_solid(leds, NUM_LEDS, color);
       showStrip();
-      if(recPack()<200){return;}
 }
 
 
@@ -696,6 +731,22 @@ void TwinkleRandom() {
    }
   FastLED.setTemperature(Temperature);
   delay(SpeedDelay);
+}
+
+#define qsuba(x, b)  ((x>b)?x-b:0)
+void plasma() {                                                 // This is the heart of this program. Sure is short. . . and fast.
+  int thisPhase = beatsin8(6,-64,64);                           // Setting phase change for a couple of waves.
+  int thatPhase = beatsin8(7,-64,64);
+
+  for (int k=0; k<NUM_LEDS; k++) {                              // For each of the LED's in the strand, set a brightness based on a wave as follows:
+
+    int colorIndex = cubicwave8((k*23)+thisPhase)/2 + cos8((k*15)+thatPhase)/2;           // Create a wave and add a phase change and add another wave with its own phase change.. Hey, you can even change the frequencies if you wish.
+    int thisBright = qsuba(colorIndex, beatsin8(7,0,96));                                 // qsub gives it a bit of 'black' dead space by setting sets a minimum value. If colorIndex < current value of beatsin8(), then bright = 0. Otherwise, bright = colorIndex..
+
+    leds[k] = ColorFromPalette(currentPalette, colorIndex, BRIGHTNESS, LINEARBLEND);  // Let's now add the foreground colour.
+  }
+  FastLED.setTemperature(Temperature);
+  delay(50);
 }
 
 // ***************************************
