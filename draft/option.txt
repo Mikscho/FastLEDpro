@@ -1,0 +1,2 @@
+Next one: Police Siren (red, blue) if counter % 2 = 0, then blue, else red
+Beginning first and last led per seq, starting to fade to middle point, with color changing
