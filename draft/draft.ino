@@ -39,6 +39,10 @@ CRGB currcolor = CRGB::White;
 CRGBPalette16 currentPalette = RainbowColors_p;
 ColorTemperature Temperature = UncorrectedTemperature;
 
+//For Function FadeToMiddle
+const int barCount = 8; 
+int bars[barCount];
+
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 //UDP Connection
@@ -72,10 +76,13 @@ void setup(void) {
   FastLED.addLeds<LED_TYPE,DATA_PIN>(leds, NUM_LEDS).setCorrection(Typical8mmPixel);
   FastLED.setBrightness(BRIGHTNESS);
   Udp.begin(localPort);
+
+  //For Function FadeToMiddle
+  for (int i = 0; i < barCount; i++) {bars[i] = i * ((NUM_LEDS * 16) / barCount);}
 }
 
 typedef void (*Animations[])();
-Animations animations = {confetti, rainbow, cloudSlowBeatWave, fire, sinelon, juggle, CylonBounce, bpm, Strobe, meteorRain, RGBLoop, FadeInOut, simpleColor, sunriseset, american, twinkle, TwinkleRandom, setsimple, stroberandom, plasma, black };
+Animations animations = {confetti, rainbow, cloudSlowBeatWave, fire, sinelon, juggle, CylonBounce, bpm, Strobe, meteorRain, RGBLoop, FadeInOut, simpleColor, sunriseset, american, twinkle, TwinkleRandom, setsimple, stroberandom, plasma, PoliceSiren, FadeToMiddle, Lightning, black };
 
 int recPack(){
   int packetSize = Udp.parsePacket();
@@ -119,70 +126,11 @@ void loop(void) {
 
 
 void switchPattern(int criteria){
+  if(criteria < 99){
+    currentAnimation = criteria;
+    black();
+  }
   switch (criteria) {
-    case 0:    //confetti
-      currentAnimation = criteria;
-      break;
-    case 1:    //rainbow
-      currentAnimation = criteria;
-      break;
-    case 2:    //cloudSlowBeatWave
-      currentAnimation = criteria;
-      break;
-    case 3:    //Fire
-      currentAnimation = criteria;
-      break;
-    case 4:    //sinelon
-      currentAnimation = criteria;
-      break;
-    case 5:    //juggle
-      currentAnimation = criteria;
-      break;
-    case 6:    //CylonBounce
-      currentAnimation = criteria;
-      break;
-    case 7:    //bpm
-      currentAnimation = criteria;
-      break;
-    case 8:    //Strobe
-      currentAnimation = criteria;
-      break;
-    case 9:    //meteorRain
-      currentAnimation = criteria;
-      break;
-    case 10:  //RGBLoop
-      currentAnimation = criteria;
-      break;
-    case 11:  //FadeInOut
-      currentAnimation = criteria;
-      break;
-    case 12: //simpleColor
-      currentAnimation = criteria;
-      break;
-    case 13: //Sunrise/Sunset
-      currentAnimation = criteria;
-      break;
-    case 14: //American red/white/blue with glitter
-      currentAnimation = criteria;
-      break;
-    case 15:  //Twinkle
-      currentAnimation = criteria;
-      break;
-    case 16:  //TwinkleRandom
-      currentAnimation = criteria;
-      break;
-    case 17:  //simpleset
-      currentAnimation = criteria;
-      break;
-    case 18:  //StrobeRandom
-      currentAnimation = criteria;
-      break;
-    case 19:  //Plasma
-      currentAnimation = criteria;
-      break;
-    case 20:  //Ligthning
-      currentAnimation = criteria;
-      break;
     case 100:    //next
       currentAnimation = (currentAnimation + 1) % ARRAY_SIZE(animations);
       break;
@@ -647,15 +595,12 @@ void FadeOut(int red, int green, int blue){
 }
 
 void sunriseset() {
-  static uint8_t heatIndex = 0; // start out at 0
-  for(int i = heatIndex; i < 255; i++){
-      setsun(heatIndex);
-      heatIndex = i;
+  for(int i = 0; i < 255; i++){
+      setsun(i);
   }
   if(recPack()<200){return;}
-  for(int j = heatIndex; j > 0; j++){
-      setsun(heatIndex);
-      heatIndex = j;
+  for(int j = 0; j < 255; j++){
+      setsun(255 - j);
   }
 }
 
@@ -747,6 +692,104 @@ void plasma() {                                                 // This is the h
   }
   FastLED.setTemperature(Temperature);
   delay(50);
+}
+
+void PoliceSiren(){
+  for(int i = 0; i < NUM_LEDS; i++){
+    if(counter % 2 == 0 && i %2 == 0){
+      setPixel(i, 255, 0, 0);
+    }else if(counter % 2 == 0 && i % 2 == 1){
+      setPixel(i, 0, 0, 0);
+    }else if(counter % 2 == 1 && i % 2 == 0){
+      setPixel(i, 0, 0, 0);
+    }else if(counter % 2 == 1 && i % 2 == 1){
+      setPixel(i, 0, 0, 255);
+    }
+  }
+  delay(500);
+}
+
+void FadeToMiddle(){
+  memset8(leds, 0, NUM_LEDS * sizeof(CRGB));
+  int Width = 4; int F16delta = 1; uint16_t Fhue16 = 0;
+    for (int i = 0; i < barCount; i++) {
+        int bar = bars[i];
+
+        // Update the "Fraction Bar" by 1/16th pixel every time
+        if (i % 2 == 0)
+            bar += F16delta;
+        else
+            bar -= F16delta;
+
+        // wrap around at end
+        // remember that F16pos contains position in "16ths of a pixel"
+        // so the 'end of the strip' is (NUM_LEDS * 16)
+        if (bar >= (NUM_LEDS * 16))
+            bar -= NUM_LEDS * 16;
+        else if (bar < 0)
+            bar = (NUM_LEDS * 16) - 1;
+
+        // draw the Fractional Bar, length=4px
+        drawFractionalBar(bar, Width, 0, 0);
+
+        bars[i] = bar;
+    }
+  
+}
+
+void drawFractionalBar(int pos16, int width, uint8_t hue, uint8_t sat)
+{
+    int i = pos16 / 16; // convert from pos to raw pixel number
+    uint8_t frac = pos16 & 0x0F; // extract the 'factional' part of the position
+    uint8_t firstpixelbrightness = 255 - (frac * 16);
+    uint8_t lastpixelbrightness = 255 - firstpixelbrightness;
+    uint8_t bright;
+    for (int n = 0; n <= width; n++) {
+        if (n == 0) {
+            // first pixel in the bar
+            bright = firstpixelbrightness;
+        }
+        else if (n == width) {
+            // last pixel in the bar
+            bright = lastpixelbrightness;
+        }
+        else {
+            // middle pixels
+            bright = 255;
+        }
+
+        leds[i] += CHSV(hue, sat, bright);
+        i++;
+        if (i == NUM_LEDS) i = 0; // wrap around
+    }
+}
+
+void Lightning(){
+  uint8_t frequency = 50;
+  uint8_t flashes = 8;                                          //the upper limit of flashes per strike
+  unsigned int dimmer = 1;
+
+  uint8_t ledstart;                                             // Starting location of a flash
+  uint8_t ledlen;
+  ledstart = random8(NUM_LEDS);                               // Determine starting location of flash
+  ledlen = random8(NUM_LEDS-ledstart);                        // Determine length of flash (not to go beyond NUM_LEDS-1)
+  
+  for (int flashCounter = 0; flashCounter < random8(3,flashes); flashCounter++) {
+    if(flashCounter == 0) dimmer = 5;                         // the brightness of the leader is scaled down by a factor of 5
+    else dimmer = random8(1,3);                               // return strokes are brighter than the leader
+    
+    fill_solid(leds+ledstart,ledlen,CHSV(255, 0, 255/dimmer));
+    FastLED.show();                       // Show a section of LED's
+    delay(random8(4,10));                                     // each flash only lasts 4-10 milliseconds
+    fill_solid(leds+ledstart,ledlen,CHSV(255,0,0));           // Clear the section of LED's
+    FastLED.show();
+    if(recPack()<200){return;}
+    if (flashCounter == 0) delay (150);                       // longer delay until next flash after the leader
+    
+    delay(50+random8(100));                                   // shorter delay between strokes  
+  } // for()
+  
+  delay(random8(frequency)*100);
 }
 
 // ***************************************
